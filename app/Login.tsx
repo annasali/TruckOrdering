@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import axios from 'axios';
 
 export default function LoginScreen() {
   const router = useRouter();
 
-  const [email, setEmail] = useState('abdullah@gmail.com');
-  const [password, setPassword] = useState('12345678');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
 
   const validateEmail = (email: string): boolean => {
@@ -24,8 +25,16 @@ export default function LoginScreen() {
     }
 
     if (isValid) {
+        axios.post('http://localhost:8000/api/login', { email, password })
+          .then(response => {
+            console.log(response.data);
+            window.localStorage.setItem('token', response.data.token);
+            Alert.alert('Login Successful');
+            router.push('/TruckRequest');
+          })
+          .catch(err => Alert.alert('Login Failed', err.message));
       console.log('Logged In');
-      router.push('/TruckRequest');
+      // router.push('/TruckRequest');
     }
   };
 

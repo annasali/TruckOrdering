@@ -1,12 +1,24 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import axios from 'axios';
 
 export default function RegisterScreen() {
   const router = useRouter();
 
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+
   const handleRegister = () => {
+
     console.log('Registered');
+    axios.post('http://localhost:8000/api/register', { name, email, password })
+      .then(response => {
+        Alert.alert('User Registered');
+        router.push('/Login');
+      })
+      .catch(err => Alert.alert('Login Failed', err.message));
     // Navigate to another screen (e.g., Login or Dashboard) after successful registration
     // router.push('/Login');
   };
@@ -24,23 +36,24 @@ export default function RegisterScreen() {
         placeholder="Full Name"
         style={styles.input}
         placeholderTextColor="#aaa"
+        value={name}
+        onChangeText={(text) => setName(text)}
+
       />
       <TextInput
         placeholder="Email"
         style={styles.input}
         placeholderTextColor="#aaa"
+        value={email}
+        onChangeText={(text) => setEmail(text)}
       />
       <TextInput
         placeholder="Password"
         secureTextEntry
         style={styles.input}
         placeholderTextColor="#aaa"
-      />
-      <TextInput
-        placeholder="Confirm Password"
-        secureTextEntry
-        style={styles.input}
-        placeholderTextColor="#aaa"
+        value={password}
+        onChangeText={(text) => setPassword(text)}
       />
 
       <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>

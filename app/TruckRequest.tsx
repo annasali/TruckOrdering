@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { router } from 'expo-router';
+import axios from 'axios';
+
 
 export default function TruckRequestPage() {
   const [location, setLocation] = useState('');
+  const [deliveryLocation, setDeliveryLocation] = useState('');
   const [size, setSize] = useState('');
   const [weight, setWeight] = useState('');
   const [pickupTime, setPickupTime] = useState(new Date());
@@ -31,20 +34,51 @@ export default function TruckRequestPage() {
       return;
     }
 
-    console.log('Truck request submitted', { location, size, weight, pickupTime, deliveryTime });
-    router.push('/Dashboard');
+    // console.log('Truck request submitted', { location, deliveryLocation,size, weight, pickupTime, deliveryTime });
+
+    const requestData = { 
+      pickup_location: location, 
+      delivery_location: deliveryLocation, 
+      size: size, 
+      weight: weight, 
+      pickup_time: pickupTime.toISOString().split('T')[0], 
+      delivery_time: deliveryTime.toISOString().split('T')[0] 
+    };
+    console.log(requestData);
+    const token = window.localStorage.getItem('token');
+    axios.post('http://localhost:8000/api/orders', requestData, {
+      headers: {
+      Authorization: 'Bearer ' + token,
+      }
+    })
+    .then(response => {
+      Alert.alert('truck request submitted');
+      router.push('/Dashboard'); 
+    })
+    .catch(err => Alert.alert('Login Failed', err.message));
+
+
+    
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Please Add Truck Request Details</Text>
       <View style={styles.form}>
-        <Text style={styles.inputLabel}>Shipping Location</Text>
+        <Text style={styles.inputLabel}>Pickup Location</Text>
         <TextInput
-          placeholder="Enter shipping location"
+          placeholder="Enter pickup location"
           style={styles.input}
           value={location}
           onChangeText={(text) => setLocation(text)}
+        />
+        
+        <Text style={styles.inputLabel}>Delivery Location</Text>
+        <TextInput
+          placeholder="Enter delivery location"
+          style={styles.input}
+          value={deliveryLocation}
+          onChangeText={(text) => setDeliveryLocation(text)}
         />
 
         <Text style={styles.inputLabel}>Weight (kg)</Text>

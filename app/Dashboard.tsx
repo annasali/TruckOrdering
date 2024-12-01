@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import axios from 'axios';
 
 interface Request {
   id: string;
-  location: string;
+  pickup_location:string
+  delivery_location: string;
   size: string;
   weight: string;
   status: string;
-  pickupTime: string;
-  deliveryTime: string;
+  pickup_time: string;
+  delivery_time: string;
 }
 
 export default function Dashboard() {
@@ -21,37 +23,45 @@ export default function Dashboard() {
 
   const fetchRequests = async () => {
     try {
-      // Simulate API response
-      const mockData: Request[] = [
-        {
-          id: '1',
-          location: 'New York',
-          size: 'Medium',
-          weight: '500kg',
-          status: 'Pending',
-          pickupTime: '2024-12-01 10:00 AM',
-          deliveryTime: '2024-12-01 04:00 PM',
+      // Simulate API 
+      const token = window.localStorage.getItem('token');
+      const response = await axios.get('http://localhost:8000/api/orders', {
+        headers: {
+          Authorization: 'Bearer '  + token,
         },
-        {
-          id: '2',
-          location: 'San Francisco',
-          size: 'Large',
-          weight: '1000kg',
-          status: 'In Progress',
-          pickupTime: '2024-12-02 08:00 AM',
-          deliveryTime: '2024-12-02 03:00 PM',
-        },
-        {
-          id: '3',
-          location: 'Chicago',
-          size: 'Small',
-          weight: '300kg',
-          status: 'Delivered',
-          pickupTime: '2024-11-30 09:00 AM',
-          deliveryTime: '2024-11-30 01:00 PM',
-        },
-      ];
-      setRequests(mockData); // This works because the types match
+      });
+      console.log(response.data);
+      const data = response.data;
+      // const mockData: Request[] = [
+      //   {
+      //     id: '1',
+      //     location: 'New York',
+      //     size: 'Medium',
+      //     weight: '500kg',
+      //     status: 'Pending',
+      //     pickupTime: '2024-12-01 10:00 AM',
+      //     deliveryTime: '2024-12-01 04:00 PM',
+      //   },
+      //   {
+      //     id: '2',
+      //     location: 'San Francisco',
+      //     size: 'Large',
+      //     weight: '1000kg',
+      //     status: 'In Progress',
+      //     pickupTime: '2024-12-02 08:00 AM',
+      //     deliveryTime: '2024-12-02 03:00 PM',
+      //   },
+      //   {
+      //     id: '3',
+      //     location: 'Chicago',
+      //     size: 'Small',
+      //     weight: '300kg',
+      //     status: 'Delivered',
+      //     pickupTime: '2024-11-30 09:00 AM',
+      //     deliveryTime: '2024-11-30 01:00 PM',
+      //   },
+      // ];
+      setRequests(data); // This works because the types match
       setLoading(false);
     } catch (error) {
       console.error('Error fetching requests:', error);
@@ -61,11 +71,12 @@ export default function Dashboard() {
 
   const renderItem = ({ item }: { item: Request }) => (
     <View style={styles.requestItem}>
-      <Text style={styles.label}>Location: <Text style={styles.value}>{item.location}</Text></Text>
+      <Text style={styles.label}>Pickup Location: <Text style={styles.value}>{item.pickup_location}</Text></Text>
+      <Text style={styles.label}>Delivery Location: <Text style={styles.value}>{item.delivery_location}</Text></Text>
       <Text style={styles.label}>Size: <Text style={styles.value}>{item.size}</Text></Text>
       <Text style={styles.label}>Weight: <Text style={styles.value}>{item.weight}</Text></Text>
-      <Text style={styles.label}>Pickup Time: <Text style={styles.value}>{item.pickupTime}</Text></Text>
-      <Text style={styles.label}>Delivery Time: <Text style={styles.value}>{item.deliveryTime}</Text></Text>
+      <Text style={styles.label}>Pickup Time: <Text style={styles.value}>{item.pickup_time}</Text></Text>
+      <Text style={styles.label}>Delivery Time: <Text style={styles.value}>{item.delivery_time}</Text></Text>
       <Text style={styles.label}>Status: <Text style={styles.value}>{item.status}</Text></Text>
     </View>
   );
